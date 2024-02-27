@@ -34,7 +34,7 @@ public class ServerManager {
     }
 
     private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
-        process = StartProcess(config.get("DIRECTORY"), Integer.parseInt(config.get("XMX")), args);
+        process = StartProcess(config.get("SERVER_DIRECTORY"), Integer.parseInt(config.get("XMX")), args);
         process.waitFor(waitTime, TimeUnit.SECONDS);
     }
 
