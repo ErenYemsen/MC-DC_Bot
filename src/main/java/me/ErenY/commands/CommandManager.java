@@ -1,7 +1,9 @@
 package me.ErenY.commands;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import me.ErenY.DiscordBot;
 import me.ErenY.myaudiomanager.MySendHandler;
+import me.ErenY.ngrokmanager.NgrokManager;
 import me.ErenY.servermanager.ServerManager;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
+    private final Dotenv config = Dotenv.configure().load();
 
     AudioManager audioManager;
     VoiceChannel voiceChannel;
@@ -61,6 +64,9 @@ public class CommandManager extends ListenerAdapter {
                 switch (i){
                     case 0:
                         //start server
+                        if (!NgrokManager.isStarted() && config.get("ngrok").equals("true")){
+                            event.getHook().sendMessage("ngrok açık değil sanki?").queue();
+                        }
                         if (ServerManager.isStarted()){
                             event.reply("already started").queue();
                             break;
@@ -81,6 +87,10 @@ public class CommandManager extends ListenerAdapter {
                         break;
                     case 1:
                         //stop server
+                        if (NgrokManager.isStarted()){
+                            NgrokManager.StopTunnel();
+                        }
+
                         if (!ServerManager.isStarted()){
                             event.reply("already stopped").queue();
                             break;
@@ -101,7 +111,7 @@ public class CommandManager extends ListenerAdapter {
                         break;
                     case 2:
                         //status
-                        event.reply("status").queue();
+                        event.reply("is server started: " + ServerManager.isStarted() + " is ngrok started: " + NgrokManager.isStarted()).queue();
                         break;
                 }
 
