@@ -64,7 +64,7 @@ public class CommandManager extends ListenerAdapter {
                 switch (i){
                     case 0:
                         //start server
-                        if (!NgrokManager.isStarted() && config.get("ngrok").equals("true")){
+                        if (!NgrokManager.isStarted() && config.get("NGROK").equals("true")){
                             event.getHook().sendMessage("ngrok açık değil sanki?").queue();
                         }
                         if (ServerManager.isStarted()){
@@ -74,9 +74,9 @@ public class CommandManager extends ListenerAdapter {
                         DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.IDLE);
                         event.reply("starting... waiting for " + ServerManager.getWaitTime() + "s").queue();
                         try {
-                            ServerManager.StartServer(null);
+                            ServerManager.StartServer(new String[]{});
                         } catch (IOException | InterruptedException e) {
-                            event.reply("botun anası sikilmiş bulunmakta naptınız amk" + e).queue();
+                            event.getHook().sendMessage("botun anası sikilmiş bulunmakta naptınız amk" + e).queue();
                         }
                         if (ServerManager.isStarted()) {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);

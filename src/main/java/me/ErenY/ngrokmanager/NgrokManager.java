@@ -41,10 +41,9 @@ public class NgrokManager {
         NgrokManager.Started = isStarted;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
-        StartTunnelPrivate();
-        System.out.println(getPublicURL());
+
 
     }
     public static void StartTunnel(){
@@ -63,10 +62,10 @@ public class NgrokManager {
                     ngrokClient = new NgrokClient.Builder().build();
                     createTunnel = new CreateTunnel.Builder().withName("ngrok").withProto(Proto.TCP).withAddr(config.get("SERVER_PORT")).build();
                     tunnel = ngrokClient.connect(createTunnel);
-
                     PublicURL = tunnel.getPublicUrl();
 
                     Started = true;
+
 
 
                 }
@@ -78,7 +77,7 @@ public class NgrokManager {
     }
 
     private static void StopTunnelPrivate(){
-        ngrokClient.disconnect(tunnel.getPublicUrl());
+        ngrokClient.kill();
     }
 
 
