@@ -72,6 +72,7 @@ public class NgrokManager {
 
     private static void StopTunnelPrivate(){
         ngrokClient.kill();
+        Started = false;
     }
 
 

@@ -83,7 +83,7 @@ public class CommandManager extends ListenerAdapter {
                             break;
                         }
                         DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.IDLE);
-                        event.reply("starting... waiting for " + ServerManager.getWaitTime() + "s").queue();
+                        event.reply("starting... wait...").queue();
                         try {
                             ServerManager.StartServer(new String[]{});
                         } catch (IOException | InterruptedException e) {
@@ -105,6 +105,7 @@ public class CommandManager extends ListenerAdapter {
                         if (ServerManager.isStarted()) {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                             event.getHook().sendMessage("Started... i guess").queue();
+                            if (NgrokManager.isStarted()) event.getHook().sendMessage(NgrokManager.getPublicURL().substring(6)).queue();
                         }
                         break;
                     case 1:
@@ -142,7 +143,9 @@ public class CommandManager extends ListenerAdapter {
                         break;
                     case 2:
                         //status
-                        event.reply("is server started: " + ServerManager.isStarted() + "\n is ngrok started: " + NgrokManager.isStarted()).queue();
+                        event.reply("is server started: " + ServerManager.isStarted() +
+                                "\n is ngrok started: " + NgrokManager.isStarted() +
+                                "\n server ip: " + NgrokManager.getPublicURL()).queue();
                         break;
                 }
 

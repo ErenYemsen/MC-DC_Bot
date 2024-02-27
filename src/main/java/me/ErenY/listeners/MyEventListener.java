@@ -4,6 +4,10 @@ import me.ErenY.ngrokmanager.NgrokManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+//TODO
+// owner super blockStarting (others cannot start or stop server or see status maybe different command for each?)
+
+
 public class MyEventListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -12,6 +16,7 @@ public class MyEventListener extends ListenerAdapter {
             event.getChannel().sendMessage("üçbir").queue();
         }
         if (NgrokManager.isStarted() && event.getMember().isOwner() && event.getMessage().getContentRaw().equals("!ngrok restart")){
+            event.getChannel().sendMessage("emrolur").queue();
             NgrokManager.StopTunnel();
             int t = 0;
             while (NgrokManager.isStarted()){
@@ -24,8 +29,8 @@ public class MyEventListener extends ListenerAdapter {
                 t++;
             }
             NgrokManager.StartTunnel();
-            event.getChannel().sendMessage("restarted?").queue();
-        } else if (!NgrokManager.isStarted()) {
+            event.getChannel().sendMessage("restarted? " + NgrokManager.getPublicURL()).queue();
+        } else if (!NgrokManager.isStarted() && event.getMember().isOwner() && event.getMessage().getContentRaw().equals("!ngrok restart")) {
             event.getChannel().sendMessage("already stopped").queue();
         }
     }

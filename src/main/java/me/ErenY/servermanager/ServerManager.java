@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ServerManager {
-    private static final int waitTime = 10;
     private static boolean started = false;
     private static Process process;
 
@@ -22,9 +21,6 @@ public class ServerManager {
 
     public static boolean isStarted() {
         return started;
-    }
-    public static int getWaitTime(){
-        return waitTime;
     }
 
     public static void StartServer(String[] args) throws IOException, InterruptedException {
@@ -36,7 +32,6 @@ public class ServerManager {
 
     private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
         process = StartProcess(DiscordBot.config.get("SERVER_DIRECTORY"), Integer.parseInt(DiscordBot.config.get("XMX")), args);
-        process.waitFor(waitTime, TimeUnit.SECONDS);
     }
 
     private static Process StartProcess(String directory, int g, String... args) throws IOException {
