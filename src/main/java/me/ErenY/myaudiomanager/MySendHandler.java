@@ -1,4 +1,4 @@
-package me.ErenY.MyAudioManager;
+package me.ErenY.myaudiomanager;
 
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 
