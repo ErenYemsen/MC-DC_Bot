@@ -11,7 +11,7 @@ public class MyEventListener extends ListenerAdapter {
         if (!event.getAuthor().isBot()) {
             event.getChannel().sendMessage("üçbir").queue();
         }
-        if (event.getMember().isOwner() && event.getMessage().getContentRaw().equals("!ngrok restart")){
+        if (NgrokManager.isStarted() && event.getMember().isOwner() && event.getMessage().getContentRaw().equals("!ngrok restart")){
             NgrokManager.StopTunnel();
             int t = 0;
             while (NgrokManager.isStarted()){
@@ -25,6 +25,8 @@ public class MyEventListener extends ListenerAdapter {
             }
             NgrokManager.StartTunnel();
             event.getChannel().sendMessage("restarted?").queue();
+        } else if (!NgrokManager.isStarted()) {
+            event.getChannel().sendMessage("already stopped").queue();
         }
     }
 
