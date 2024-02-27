@@ -1,6 +1,5 @@
 package me.ErenY;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import me.ErenY.commands.CommandManager;
 import me.ErenY.listeners.MyEventListener;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -14,13 +13,11 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 
 public class DiscordBot {
-    private final Dotenv config;
     private final ShardManager shardManager;
     private static DiscordBot staticDiscordBot;
 
     public DiscordBot() {
-        config = Dotenv.configure().load();
-        String token = config.get("TOKEN");
+        String token = System.getenv("TOKEN");
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(token);
         builder.enableIntents(GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS);
         builder.setStatus(OnlineStatus.DO_NOT_DISTURB);
@@ -35,9 +32,6 @@ public class DiscordBot {
 
     public ShardManager getShardManager(){
         return  this.shardManager;
-    }
-    public Dotenv getConfig(){
-        return this.config;
     }
 
     public static DiscordBot getStaticDiscordBot() {

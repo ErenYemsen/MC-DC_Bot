@@ -1,7 +1,8 @@
 package me.ErenY.servermanager;
 
 
-import io.github.cdimascio.dotenv.Dotenv;
+import me.ErenY.DiscordBot;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ServerManager {
-    private static final Dotenv config = Dotenv.configure().load();
     private static final int waitTime = 10;
     private static boolean started = false;
     private static Process process;
@@ -34,7 +34,7 @@ public class ServerManager {
     }
 
     private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
-        process = StartProcess(config.get("SERVER_DIRECTORY"), Integer.parseInt(config.get("XMX")), args);
+        process = StartProcess(System.getenv("SERVER_DIRECTORY"), Integer.parseInt(System.getenv("XMX")), args);
         process.waitFor(waitTime, TimeUnit.SECONDS);
     }
 
@@ -61,6 +61,8 @@ public class ServerManager {
                     while ((line = br.readLine()) != null) {
                         if (line.contains("Done")){
                             started = true;
+                        } else if (line.contains("Stopping")) {
+                            started = false;
                         }
                         System.out.println(line);
                     }
@@ -81,7 +83,6 @@ public class ServerManager {
         out.write("stop");
         out.write(System.lineSeparator());
         out.flush();
-        started = false;
     }
 
 }

@@ -4,12 +4,9 @@ import com.github.alexdlaird.ngrok.NgrokClient;
 import com.github.alexdlaird.ngrok.protocol.CreateTunnel;
 import com.github.alexdlaird.ngrok.protocol.Proto;
 import com.github.alexdlaird.ngrok.protocol.Tunnel;
-import io.github.cdimascio.dotenv.Dotenv;
 import me.ErenY.DiscordBot;
 
 public class NgrokManager {
-
-    private static Dotenv config;
     private static boolean Started = false;
 
     private static NgrokClient ngrokClient;
@@ -57,16 +54,13 @@ public class NgrokManager {
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    config = Dotenv.configure().load();
 
                     ngrokClient = new NgrokClient.Builder().build();
-                    createTunnel = new CreateTunnel.Builder().withName("ngrok").withProto(Proto.TCP).withAddr(config.get("SERVER_PORT")).build();
+                    createTunnel = new CreateTunnel.Builder().withName("ngrok").withProto(Proto.TCP).withAddr(System.getenv("SERVER_PORT")).build();
                     tunnel = ngrokClient.connect(createTunnel);
                     PublicURL = tunnel.getPublicUrl();
 
                     Started = true;
-
-
 
                 }
             };

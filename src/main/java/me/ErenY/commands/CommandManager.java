@@ -1,6 +1,5 @@
 package me.ErenY.commands;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import me.ErenY.DiscordBot;
 import me.ErenY.myaudiomanager.MySendHandler;
 import me.ErenY.ngrokmanager.NgrokManager;
@@ -21,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
-    private final Dotenv config = Dotenv.configure().load();
-
     AudioManager audioManager;
     VoiceChannel voiceChannel;
 
@@ -64,8 +61,22 @@ public class CommandManager extends ListenerAdapter {
                 switch (i){
                     case 0:
                         //start server
-                        if (!NgrokManager.isStarted() && config.get("NGROK").equals("true")){
-                            event.getHook().sendMessage("ngrok açık değil sanki?").queue();
+                        if (System.getenv("NGROK").equals("true")){
+                            NgrokManager.StartTunnel();
+                            int timeNgrok = 0;
+                            while (!NgrokManager.isStarted()){
+                                if (timeNgrok>60) break;
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                timeNgrok++;
+                            }
+                        }
+
+                        if (!NgrokManager.isStarted() && System.getenv("NGROK").equals("true")){
+                            event.getHook().sendMessage("ngrok timed out").queue();
                         }
                         if (ServerManager.isStarted()){
                             event.reply("already started").queue();
@@ -78,11 +89,22 @@ public class CommandManager extends ListenerAdapter {
                         } catch (IOException | InterruptedException e) {
                             event.getHook().sendMessage("botun anası sikilmiş bulunmakta naptınız amk" + e).queue();
                         }
+                        int timeStart = 0;
+                        while (!ServerManager.isStarted()){
+                            if (timeStart>60) {
+                                event.getHook().sendMessage("timed out").queue();
+                                break;
+                            }
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                            timeStart++;
+                        }
                         if (ServerManager.isStarted()) {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                             event.getHook().sendMessage("Started... i guess").queue();
-                        }else {
-                            event.getHook().sendMessage("açılmadı sanki ama bi deneyin bakayım").queue();
                         }
                         break;
                     case 1:
@@ -102,16 +124,25 @@ public class CommandManager extends ListenerAdapter {
                         } catch (Exception e) {
                             event.getHook().sendMessage("durdururken anası sikildi umarım world siki tutumaz").queue();
                         }
-                        if (!ServerManager.isStarted()){
-                            DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.DO_NOT_DISTURB);
-                            event.getHook().sendMessage("stopped succesfully").queue();
-                        }else {
-                            event.getHook().sendMessage("kapanmadı gibi de anlayamadım çok").queue();
+                        int timeStop = 0;
+                        while (ServerManager.isStarted()){
+                            if (timeStop>60){
+                                event.getHook().sendMessage("timed out").queue();
+                                break;
+                            }
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                            timeStop++;
                         }
+                        DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.DO_NOT_DISTURB);
+                        event.getHook().sendMessage("stopped succesfully").queue();
                         break;
                     case 2:
                         //status
-                        event.reply("is server started: " + ServerManager.isStarted() + " is ngrok started: " + NgrokManager.isStarted()).queue();
+                        event.reply("is server started: " + ServerManager.isStarted() + "\n is ngrok started: " + NgrokManager.isStarted()).queue();
                         break;
                 }
 
