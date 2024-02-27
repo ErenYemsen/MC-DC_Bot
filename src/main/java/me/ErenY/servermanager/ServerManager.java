@@ -1,6 +1,7 @@
 package me.ErenY.servermanager;
 
 
+import io.github.cdimascio.dotenv.Dotenv;
 import me.ErenY.DiscordBot;
 
 import java.io.*;
@@ -34,7 +35,7 @@ public class ServerManager {
     }
 
     private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
-        process = StartProcess(System.getenv("SERVER_DIRECTORY"), Integer.parseInt(System.getenv("XMX")), args);
+        process = StartProcess(DiscordBot.config.get("SERVER_DIRECTORY"), Integer.parseInt(DiscordBot.config.get("XMX")), args);
         process.waitFor(waitTime, TimeUnit.SECONDS);
     }
 

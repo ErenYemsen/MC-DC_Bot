@@ -56,7 +56,7 @@ public class NgrokManager {
                 public void run() {
 
                     ngrokClient = new NgrokClient.Builder().build();
-                    createTunnel = new CreateTunnel.Builder().withName("ngrok").withProto(Proto.TCP).withAddr(System.getenv("SERVER_PORT")).build();
+                    createTunnel = new CreateTunnel.Builder().withName("ngrok").withProto(Proto.TCP).withAddr(DiscordBot.config.get("SERVER_PORT")).build();
                     tunnel = ngrokClient.connect(createTunnel);
                     PublicURL = tunnel.getPublicUrl();
 

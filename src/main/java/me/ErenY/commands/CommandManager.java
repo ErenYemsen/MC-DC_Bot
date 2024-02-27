@@ -61,7 +61,7 @@ public class CommandManager extends ListenerAdapter {
                 switch (i){
                     case 0:
                         //start server
-                        if (System.getenv("NGROK").equals("true")){
+                        if (DiscordBot.config.get("NGROK").equals("true")){
                             NgrokManager.StartTunnel();
                             int timeNgrok = 0;
                             while (!NgrokManager.isStarted()){
@@ -75,7 +75,7 @@ public class CommandManager extends ListenerAdapter {
                             }
                         }
 
-                        if (!NgrokManager.isStarted() && System.getenv("NGROK").equals("true")){
+                        if (!NgrokManager.isStarted() && DiscordBot.config.get("NGROK").equals("true")){
                             event.getHook().sendMessage("ngrok timed out").queue();
                         }
                         if (ServerManager.isStarted()){
