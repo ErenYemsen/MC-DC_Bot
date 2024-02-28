@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 
 public class DiscordBot {
+    public static boolean lockdownMode = false;
     public static final Dotenv config = Dotenv.configure().load();
     private final ShardManager shardManager;
     private static DiscordBot staticDiscordBot;

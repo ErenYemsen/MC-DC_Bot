@@ -55,6 +55,10 @@ public class CommandManager extends ListenerAdapter {
                 }
                 break;
             case "server":
+                if (DiscordBot.lockdownMode){ //TODO add !isOwner to be able to use these as an owner
+                    event.reply("ikinci bir emre kadar server karartma uygulayacaktır").queue();
+                    break;
+                }
                 OptionMapping optionMapping = event.getOption("options");
                 int i = optionMapping.getAsInt();
 
@@ -65,7 +69,7 @@ public class CommandManager extends ListenerAdapter {
                             NgrokManager.StartTunnel();
                             int timeNgrok = 0;
                             while (!NgrokManager.isStarted()){
-                                if (timeNgrok>60) break;
+                                if (timeNgrok > Integer.parseInt(DiscordBot.config.get("COMMAND_TIMEOUT"))) break;
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
@@ -91,7 +95,7 @@ public class CommandManager extends ListenerAdapter {
                         }
                         int timeStart = 0;
                         while (!ServerManager.isStarted()){
-                            if (timeStart>60) {
+                            if (timeStart > Integer.parseInt(DiscordBot.config.get("COMMAND_TIMEOUT"))) {
                                 event.getHook().sendMessage("timed out").queue();
                                 break;
                             }
@@ -127,7 +131,7 @@ public class CommandManager extends ListenerAdapter {
                         }
                         int timeStop = 0;
                         while (ServerManager.isStarted()){
-                            if (timeStop>60){
+                            if (timeStop > Integer.parseInt(DiscordBot.config.get("COMMAND_TIMEOUT"))){
                                 event.getHook().sendMessage("timed out").queue();
                                 break;
                             }
