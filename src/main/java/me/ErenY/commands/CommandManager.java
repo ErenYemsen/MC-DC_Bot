@@ -100,7 +100,7 @@ public class CommandManager extends ListenerAdapter {
                         try {
                             ServerManager.StopServer();
                         } catch (Exception e) {
-                            event.getHook().sendMessage("durdururken anası sikildi umarım world siki tutumaz").queue();
+                            event.getHook().sendMessage("durdururken anası sikildi umarım world siki tutmaz " + e).queue();
                         }
                         int timeStop = 0;
                         while (ServerManager.isStarted()){
@@ -120,10 +120,7 @@ public class CommandManager extends ListenerAdapter {
                         break;
                     case 2:
                         //status
-                        event.reply("is server started: " + ServerManager.isStarted() +
-                                "\n is ngrok started: " + NgrokManager.isStarted() +
-                                "\n server ip: " + NgrokManager.getPublicURL() +
-                                "\n player count: " + ServerManager.getListofplayers().size()).queue();
+                        event.reply(ServerManager.ServerStatus()).queue();
                         break;
                 }
                 break;

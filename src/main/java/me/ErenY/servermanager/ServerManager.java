@@ -4,6 +4,7 @@ package me.ErenY.servermanager;
 import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class ServerManager {
     }
     public static List<String> getListofplayers() {
         return listofplayers;
+    }
+
+    public static String ServerStatus(){
+        return ServerStatusPrivate();
     }
 
     public static boolean isStarted() {
@@ -100,6 +105,7 @@ public class ServerManager {
         out.write(System.lineSeparator());
         out.flush();
     }
+
     private static void SendMessageToServerPrivate(String message, String sender) throws IOException {
         BufferedWriter send = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
         send.write("say [from Discord]" + sender + ": " + message);
@@ -107,5 +113,10 @@ public class ServerManager {
         send.flush();
     }
 
-
+    private static String ServerStatusPrivate(){
+        return "is server started: " + started +
+                "\nis ngrok started: " + NgrokManager.isStarted() +
+                "\nserver ip: " + NgrokManager.getPublicURL() +
+                "\nplayer count: " + listofplayers.size();
+    }
 }

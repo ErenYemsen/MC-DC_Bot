@@ -61,6 +61,11 @@ public class MyEventListener extends ListenerAdapter {
                         }
                         ts++;
                     }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     event.getChannel().sendMessage("restarted? " + NgrokManager.getPublicURL()).queue();
                 }else {
                     event.getChannel().sendMessage("alreaddy stopped").queue();
