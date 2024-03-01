@@ -1,11 +1,9 @@
 package me.ErenY.commands;
 
 import me.ErenY.DiscordBot;
-import me.ErenY.myaudiomanager.MySendHandler;
 import me.ErenY.ngrokmanager.NgrokManager;
 import me.ErenY.servermanager.ServerManager;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -14,7 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.managers.AudioManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +28,8 @@ public class CommandManager extends ListenerAdapter {
                 event.reply("pong" + "\n" + "ping: " + (System.currentTimeMillis() - time)).setEphemeral(true).queue();
                 break;
             case "server":
-                if (DiscordBot.lockdownMode){ //TODO add !isOwner to be able to use these as an owner
-                    event.reply("ikinci bir emre kadar server karartma uygulayacaktır").queue();
+                if (DiscordBot.lockdownMode && !event.getMember().isOwner()){
+                    event.reply("ikinci bir emre kadar server yönetimine el konulmuştur").queue();
                     break;
                 }
                 OptionMapping optionMapping = event.getOption("options");
@@ -125,7 +122,8 @@ public class CommandManager extends ListenerAdapter {
                         //status
                         event.reply("is server started: " + ServerManager.isStarted() +
                                 "\n is ngrok started: " + NgrokManager.isStarted() +
-                                "\n server ip: " + NgrokManager.getPublicURL()).queue();
+                                "\n server ip: " + NgrokManager.getPublicURL() +
+                                "\n player count: " + ServerManager.getListofplayers().size()).queue();
                         break;
                 }
                 break;
@@ -138,11 +136,11 @@ public class CommandManager extends ListenerAdapter {
                 String message = optionMapping1.getAsString();
 
                 try {
-                    ServerManager.SendMessageToServer(message, event.getMember().getNickname());
+                    ServerManager.SendMessageToServer(message, event.getUser().getName());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
+                event.reply("[to Server]" + event.getUser().getName() + ": " + message).queue();
                 break;
         }
 

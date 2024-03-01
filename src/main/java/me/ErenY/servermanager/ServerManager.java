@@ -2,6 +2,9 @@ package me.ErenY.servermanager;
 
 
 import me.ErenY.DiscordBot;
+import me.ErenY.ngrokmanager.NgrokManager;
+import net.dv8tion.jda.api.OnlineStatus;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,11 +12,15 @@ import java.util.List;
 
 
 public class ServerManager {
+    private static final List<String> listofplayers = new ArrayList<>();
     private static boolean started = false;
     private static Process process;
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
+    }
+    public static List<String> getListofplayers() {
+        return listofplayers;
     }
 
     public static boolean isStarted() {
@@ -55,12 +62,23 @@ public class ServerManager {
                     String line;
                     System.out.println(Arrays.toString(args));
                     while ((line = br.readLine()) != null) {
-                        //todo add something to count players
+                        //todo
                         // -maybe send mc chat messages to dc(if wanted?) ?
                         if (line.contains("Done")){
                             started = true;
+                            DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                         } else if (line.contains("Stopping")) {
                             started = false;
+                            NgrokManager.StopTunnel();
+                            DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.DO_NOT_DISTURB);
+                        }
+                        if (line.contains("joined")){
+                            List<String> listofwords = Arrays.asList(line.split(" "));
+                            listofplayers.add(listofwords.get(listofwords.indexOf("joined")-1));
+                        }
+                        if (line.contains("left")){
+                            List<String> listofwords = Arrays.asList(line.split(" "));
+                            listofplayers.remove(listofwords.get(listofwords.indexOf("left")-1));
                         }
                         System.out.println(line);
                     }
@@ -82,12 +100,9 @@ public class ServerManager {
         out.write(System.lineSeparator());
         out.flush();
     }
-
-    //todo add a method to be able to send messages to minecraft chat from discord chat
-    // (maybe connect discord with minecraft or just print dc name)
     private static void SendMessageToServerPrivate(String message, String sender) throws IOException {
         BufferedWriter send = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-        send.write("say [Discord] " + sender + ": " + message);
+        send.write("say [from Discord]" + sender + ": " + message);
         send.write(System.lineSeparator());
         send.flush();
     }

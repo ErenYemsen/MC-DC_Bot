@@ -2,6 +2,7 @@ package me.ErenY.listeners;
 
 import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
+import me.ErenY.servermanager.ServerManager;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,6 +14,19 @@ public class MyEventListener extends ListenerAdapter {
 
         if (!event.getAuthor().isBot()) {
             event.getChannel().sendMessage("üçbir").queue();
+        }
+
+        if (event.getMessage().getContentRaw().equals("!ngrok stop")){
+            if (event.getMember().isOwner()){
+                if (!NgrokManager.isStarted()){
+                    event.getChannel().sendMessage("already stopped").queue();
+                } else {
+                    NgrokManager.StopTunnel();
+                    event.getChannel().sendMessage("stooped ngrok").queue();
+                }
+            }else {
+                event.getChannel().sendMessage("nah").queue();
+            }
         }
 
         if (event.getMessage().getContentRaw().equals("!ngrok restart")){
@@ -60,7 +74,7 @@ public class MyEventListener extends ListenerAdapter {
             if (event.getMember().isOwner()){
                 if (!DiscordBot.lockdownMode){
                     DiscordBot.lockdownMode = true;
-                    event.getChannel().sendMessage("ikinci bir emre kadar kontrole el konulmuştur").queue();
+                    event.getChannel().sendMessage("ikinci bir emre kadar yönetime el konulmuştur").queue();
                     DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.watching("Big Brother"));
 
                 }else {
@@ -72,6 +86,18 @@ public class MyEventListener extends ListenerAdapter {
 
             }else {
                 event.getChannel().sendMessage("sg").queue();
+            }
+        }
+
+        if (event.getMessage().getContentRaw().equals("!server players")){
+            if (event.getMember().isOwner()){
+                if (ServerManager.isStarted()){
+                    event.getChannel().sendMessage(ServerManager.getListofplayers().toString()).queue();
+                }else {
+                    event.getChannel().sendMessage("Server is offline").queue();
+                }
+            }else {
+                event.getChannel().sendMessage("nah").queue();
             }
         }
 
