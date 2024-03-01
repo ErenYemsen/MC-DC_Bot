@@ -1,14 +1,11 @@
 package me.ErenY.servermanager;
 
 
-import io.github.cdimascio.dotenv.Dotenv;
 import me.ErenY.DiscordBot;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 public class ServerManager {
@@ -28,6 +25,9 @@ public class ServerManager {
     }
     public static void StopServer() throws IOException, InterruptedException {
         StopProcess();
+    }
+    public static void SendMessageToServer(String message, String sender) throws IOException {
+        SendMessageToServerPrivate(message, sender);
     }
 
     private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
@@ -55,6 +55,8 @@ public class ServerManager {
                     String line;
                     System.out.println(Arrays.toString(args));
                     while ((line = br.readLine()) != null) {
+                        //todo add something to count players
+                        // -maybe send mc chat messages to dc(if wanted?) ?
                         if (line.contains("Done")){
                             started = true;
                         } else if (line.contains("Stopping")) {
@@ -80,5 +82,15 @@ public class ServerManager {
         out.write(System.lineSeparator());
         out.flush();
     }
+
+    //todo add a method to be able to send messages to minecraft chat from discord chat
+    // (maybe connect discord with minecraft or just print dc name)
+    private static void SendMessageToServerPrivate(String message, String sender) throws IOException {
+        BufferedWriter send = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+        send.write("say [Discord] " + sender + ": " + message);
+        send.write(System.lineSeparator());
+        send.flush();
+    }
+
 
 }

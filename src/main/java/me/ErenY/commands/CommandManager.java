@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
-    AudioManager audioManager;
-    VoiceChannel voiceChannel;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -31,28 +29,6 @@ public class CommandManager extends ListenerAdapter {
         switch (command){
             case "ping":
                 event.reply("pong" + "\n" + "ping: " + (System.currentTimeMillis() - time)).setEphemeral(true).queue();
-                break;
-            case "join":
-                audioManager = event.getGuild().getAudioManager();
-                voiceChannel = (VoiceChannel) event.getMember().getVoiceState().getChannel();
-                if (voiceChannel == null){
-                    event.reply("join a voice channel first").setEphemeral(true).queue();
-                    break;
-                }
-
-                audioManager.setSendingHandler(new MySendHandler());
-
-                audioManager.openAudioConnection(voiceChannel);
-
-                event.reply("joined").setEphemeral(true).queue();
-                break;
-            case "leave":
-                if (audioManager.isConnected()){
-                    audioManager.closeAudioConnection();
-                    event.reply("leaved").setEphemeral(true).queue();
-                }else {
-                    event.reply("bot is not connected").setEphemeral(true).queue();
-                }
                 break;
             case "server":
                 if (DiscordBot.lockdownMode){ //TODO add !isOwner to be able to use these as an owner
@@ -152,9 +128,22 @@ public class CommandManager extends ListenerAdapter {
                                 "\n server ip: " + NgrokManager.getPublicURL()).queue();
                         break;
                 }
+                break;
+            case "say":
+                if (!ServerManager.isStarted()){
+                    event.reply("Server is offline").queue();
+                    break;
+                }
+                OptionMapping optionMapping1 = event.getOption("message");
+                String message = optionMapping1.getAsString();
+
+                try {
+                    ServerManager.SendMessageToServer(message, event.getMember().getNickname());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
                 break;
-
         }
 
     }
@@ -163,8 +152,6 @@ public class CommandManager extends ListenerAdapter {
     public void onGuildReady(GuildReadyEvent event) {
         List<CommandData> commands = new ArrayList<>();
         commands.add(Commands.slash("ping", "pong"));
-        commands.add(Commands.slash("join", "joins voice"));
-        commands.add(Commands.slash("leave", "leaves"));
 
         OptionData option1 = new OptionData(OptionType.INTEGER, "options", "select option", true)
                 .addChoice("Start", 0L)
@@ -172,6 +159,10 @@ public class CommandManager extends ListenerAdapter {
                 .addChoice("Status", 2L);
 
         commands.add(Commands.slash("server", "manage server").addOptions(option1));
+
+        OptionData option2 = new OptionData(OptionType.STRING, "message", "send message to server", true);
+
+        commands.add(Commands.slash("say", "send message to the server").addOptions(option2));
 
         event.getGuild().updateCommands().addCommands(commands).queue();
     }
