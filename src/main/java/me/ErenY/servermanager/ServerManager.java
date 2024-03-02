@@ -67,8 +67,6 @@ public class ServerManager {
                     String line;
                     System.out.println(Arrays.toString(args));
                     while ((line = br.readLine()) != null) {
-                        //todo
-                        // -maybe send mc chat messages to dc(if wanted?) ?
                         if (line.contains("Done")){
                             started = true;
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
@@ -84,6 +82,13 @@ public class ServerManager {
                         if (line.contains("left")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             listofplayers.remove(listofwords.get(listofwords.indexOf("left")-1));
+                        }
+                        if (line.contains("!d ")){
+                            List<String> listofwords = Arrays.asList(line.split(" "));
+                            int i = listofwords.indexOf("!d");
+                            DiscordBot.getStaticDiscordBot().getShardManager()
+                                    .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
+                                    .sendMessage(listofwords.get(i-1) + " " + listofwords.get(i+1)).queue();
                         }
                         System.out.println(line);
                     }
