@@ -133,7 +133,7 @@ public class CommandManager extends ListenerAdapter {
                 String message = optionMapping1.getAsString();
 
                 try {
-                    ServerManager.SendMessageToServer(message, event.getUser().getName());
+                    ServerManager.SendMessageToServer("say [from Discord]" + event.getUser().getName() + ": " + message);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -152,9 +152,6 @@ public class CommandManager extends ListenerAdapter {
                 .addChoice("Start", 0L)
                 .addChoice("Stop", 1L)
                 .addChoice("Status", 2L);
-
-        //todo add say and command choice to /server (maybe add command as text to only for owner to be able to do)
-
         commands.add(Commands.slash("server", "manage server").addOptions(option1));
 
         OptionData option2 = new OptionData(OptionType.STRING, "message", "send message to server", true);

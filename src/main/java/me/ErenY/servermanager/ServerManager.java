@@ -4,12 +4,9 @@ package me.ErenY.servermanager;
 import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -39,8 +36,8 @@ public class ServerManager {
     public static void StopServer() throws IOException, InterruptedException {
         StopProcess();
     }
-    public static void SendMessageToServer(String message, String sender) throws IOException {
-        SendMessageToServerPrivate(message, sender);
+    public static void SendMessageToServer(String message) throws IOException {
+        SendMessageToServerPrivate(message);
     }
 
     private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
@@ -111,9 +108,9 @@ public class ServerManager {
         out.flush();
     }
 
-    private static void SendMessageToServerPrivate(String message, String sender) throws IOException {
+    private static void SendMessageToServerPrivate(String message) throws IOException {
         BufferedWriter send = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-        send.write("say [from Discord]" + sender + ": " + message);
+        send.write(message);
         send.write(System.lineSeparator());
         send.flush();
     }
