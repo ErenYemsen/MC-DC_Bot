@@ -6,7 +6,7 @@ import com.github.alexdlaird.ngrok.protocol.Proto;
 import com.github.alexdlaird.ngrok.protocol.Tunnel;
 import me.ErenY.DiscordBot;
 
-public class NgrokManager {
+public class NgrokManager { //todo implement with a better way
     private static boolean Started = false;
 
     private static NgrokClient ngrokClient;

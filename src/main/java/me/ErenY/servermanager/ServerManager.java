@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -74,6 +75,7 @@ public class ServerManager {
                             started = false;
                             NgrokManager.StopTunnel();
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.DO_NOT_DISTURB);
+                            listofplayers.clear();
                         }
                         if (line.contains("joined")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
@@ -84,11 +86,9 @@ public class ServerManager {
                             listofplayers.remove(listofwords.get(listofwords.indexOf("left")-1));
                         }
                         if (line.contains("!d ")){
-                            List<String> listofwords = Arrays.asList(line.split(" "));
-                            int i = listofwords.indexOf("!d");
                             DiscordBot.getStaticDiscordBot().getShardManager()
                                     .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
-                                    .sendMessage(listofwords.get(i-1) + " " + listofwords.get(i+1)).queue();
+                                    .sendMessage(line.substring(line.indexOf("!d ") + 3)).queue();
                         }
                         System.out.println(line);
                     }
