@@ -5,12 +5,13 @@ import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
 import net.dv8tion.jda.api.OnlineStatus;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.sql.Time;
+import java.util.*;
 
 
 public class ServerManager {
+    private static Timer timer;
+    private static TimerTask task;
     private static final List<String> listofplayers = new ArrayList<>();
     private static boolean started = false;
     private static Process process;
@@ -77,10 +78,16 @@ public class ServerManager {
                         if (line.contains("joined")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             listofplayers.add(listofwords.get(listofwords.indexOf("joined")-1));
+                            if (timer != null){
+                                CancelTimer();
+                            }
                         }
                         if (line.contains("left")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             listofplayers.remove(listofwords.get(listofwords.indexOf("left")-1));
+                            if (listofplayers.isEmpty()){
+                                StartTimer();
+                            }
                         }
                         if (line.contains("!d ")){
                             DiscordBot.getStaticDiscordBot().getShardManager()
@@ -120,5 +127,26 @@ public class ServerManager {
                 "\nis ngrok started: " + NgrokManager.isStarted() +
                 "\nserver ip: " + NgrokManager.getPublicURL() +
                 "\nplayer count: " + listofplayers.size();
+    }
+
+    private static void StartTimer(){
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    StopServer();
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                DiscordBot.getStaticDiscordBot().getShardManager()
+                        .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
+                        .sendMessage("olm çıkarken kapatsanıza").queue();
+            }
+        };
+
+        timer.schedule(task, Long.parseLong(DiscordBot.config.get("SERVER_TIMEOUT_MIN"))*1000*60);
+    }
+    private static void CancelTimer(){
+        timer.cancel();
     }
 }
