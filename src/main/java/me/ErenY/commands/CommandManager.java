@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
@@ -62,7 +64,17 @@ public class CommandManager extends ListenerAdapter {
                         DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.IDLE);
                         event.reply("starting... wait...").queue();
                         try {
-                            ServerManager.StartServer(new String[]{});
+                            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 9){
+                                if (!event.getMember().isOwner()){
+                                ServerManager.StartServer(Integer.parseInt(DiscordBot.config.get("XMX"))/2, null);
+                                event.getHook().sendMessage("bu saatte napıyon sana yarım ciguli ram çok lazımsa ara").queue();
+                                }else {
+                                    event.getHook().sendMessage("emredersiniz hükümdarım").queue();
+                                    ServerManager.StartServer(Integer.parseInt(DiscordBot.config.get("XMX")), null);
+                                }
+                            }else {
+                                ServerManager.StartServer(Integer.parseInt(DiscordBot.config.get("XMX")), null);
+                            }
                         } catch (IOException | InterruptedException e) {
                             event.getHook().sendMessage("botun anası sikilmiş bulunmakta naptınız amk" + e).queue();
                         }
@@ -82,7 +94,9 @@ public class CommandManager extends ListenerAdapter {
                         if (ServerManager.isStarted()) {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                             event.getHook().sendMessage("Started... i guess").queue();
-                            if (NgrokManager.isStarted()) event.getHook().sendMessage(NgrokManager.getPublicURL().substring(6)).queue();
+                            if (NgrokManager.isStarted()){
+                                event.getHook().sendMessage(NgrokManager.getPublicURL().substring(6)).queue();
+                            }
                         }
                         break;
                     case 1:

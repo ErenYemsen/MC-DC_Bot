@@ -4,6 +4,8 @@ package me.ErenY.servermanager;
 import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
+
 import java.io.*;
 import java.sql.Time;
 import java.util.*;
@@ -31,8 +33,8 @@ public class ServerManager {
         return started;
     }
 
-    public static void StartServer(String[] args) throws IOException, InterruptedException {
-        StartServerPrivate(args);
+    public static void StartServer(int g, String[] args) throws IOException, InterruptedException {
+        StartServerPrivate(g, args);
     }
     public static void StopServer() throws IOException, InterruptedException {
         StopProcess();
@@ -41,8 +43,8 @@ public class ServerManager {
         SendMessageToServerPrivate(message);
     }
 
-    private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
-        process = StartProcess(DiscordBot.config.get("SERVER_DIRECTORY"), Integer.parseInt(DiscordBot.config.get("XMX")), args);
+    private static void StartServerPrivate(int g, String[] args) throws IOException, InterruptedException {
+        process = StartProcess(DiscordBot.config.get("SERVER_DIRECTORY"), g, args);
     }
 
     private static Process StartProcess(String directory, int g, String... args) throws IOException {
@@ -81,12 +83,14 @@ public class ServerManager {
                             if (timer != null){
                                 CancelTimer();
                             }
+                            DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.playing(listofplayers.size() + " kişi"));
                         }
                         if (line.contains("left")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             listofplayers.remove(listofwords.get(listofwords.indexOf("left")-1));
                             if (listofplayers.isEmpty()){
                                 StartTimer();
+                                DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.watching("porno"));
                             }
                         }
                         if (line.contains("!d ")){
