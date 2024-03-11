@@ -14,10 +14,13 @@ public class MyEventListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
+        /*
 
         if (!event.getAuthor().isBot()) {
             event.getChannel().sendMessage("üçbir").queue();
         }
+
+         */
 
         if (message.contains("!command ")){
             if (event.getMember().isOwner()){
