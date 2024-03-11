@@ -41,6 +41,9 @@ How-to-use
 - others are optional and default is probably fine
 
 
+2.change its name to .env
+
+
 3.add your bot to your discord
 
 
