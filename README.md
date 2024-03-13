@@ -32,6 +32,8 @@ How-to-use
 -
 1.Edit envexample.txt
 
+- install ngrok(if you want) and config your authtoken (check ngrok website for how to)
+
 - get your discord bot token and enter it in token section
 
 - enter the directory of the server.jar file
