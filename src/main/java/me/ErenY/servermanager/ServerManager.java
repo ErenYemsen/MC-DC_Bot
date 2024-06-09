@@ -72,7 +72,9 @@ public class ServerManager {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                         } else if (line.contains("Stopping")) {
                             started = false;
+                            if (NgrokManager.isStarted()){
                             NgrokManager.StopTunnel();
+                            }
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.DO_NOT_DISTURB);
                         }
                         if (line.contains("joined")){
@@ -86,9 +88,10 @@ public class ServerManager {
                         if (line.contains("!d ")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             int i = listofwords.indexOf("!d");
+                            int j = line.indexOf("!d");
                             DiscordBot.getStaticDiscordBot().getShardManager()
                                     .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
-                                    .sendMessage(listofwords.get(i-1) + " " + listofwords.get(i+1)).queue();
+                                    .sendMessage(listofwords.get(i-1) + " " + line.substring(j+3)).queue();
                         }
                         System.out.println(line);
                     }

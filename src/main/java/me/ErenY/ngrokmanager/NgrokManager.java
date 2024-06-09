@@ -1,6 +1,7 @@
 package me.ErenY.ngrokmanager;
 
 import com.github.alexdlaird.ngrok.NgrokClient;
+import com.github.alexdlaird.ngrok.process.NgrokProcess;
 import com.github.alexdlaird.ngrok.protocol.CreateTunnel;
 import com.github.alexdlaird.ngrok.protocol.Proto;
 import com.github.alexdlaird.ngrok.protocol.Tunnel;
@@ -34,13 +35,16 @@ public class NgrokManager {
         return PublicURL;
     }
 
+    public static void setPublicURL(String publicURL) {
+        PublicURL = publicURL;
+    }
+
     public static void setIsStarted(boolean isStarted) {
         NgrokManager.Started = isStarted;
     }
 
     public static void main(String[] args) throws InterruptedException {
-
-
+        StartTunnel();
 
     }
     public static void StartTunnel(){

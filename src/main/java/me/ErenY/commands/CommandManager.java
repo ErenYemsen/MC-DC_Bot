@@ -4,6 +4,7 @@ import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
 import me.ErenY.servermanager.ServerManager;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -81,6 +82,9 @@ public class CommandManager extends ListenerAdapter {
                         }
                         if (ServerManager.isStarted()) {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
+                            if (DiscordBot.config.get("NGROK").equalsIgnoreCase("True")){
+                                DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.customStatus(NgrokManager.getPublicURL()));
+                            }
                             event.getHook().sendMessage("Started... i guess").queue();
                             if (NgrokManager.isStarted()) event.getHook().sendMessage(NgrokManager.getPublicURL().substring(6)).queue();
                         }
