@@ -39,8 +39,8 @@ public class ServerManager {
     public static void StopServer() throws IOException, InterruptedException {
         StopProcess();
     }
-    public static void SendMessageToServer(String message, String sender) throws IOException {
-        SendMessageToServerPrivate(message, sender);
+    public static void SendMessageToServer(String message) throws IOException {
+        SendMessageToServerPrivate(message);
     }
 
     private static void StartServerPrivate(int g, String[] args) throws IOException, InterruptedException {
@@ -101,7 +101,7 @@ public class ServerManager {
                             int j = line.indexOf("!d");
                             DiscordBot.getStaticDiscordBot().getShardManager()
                                     .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
-                                    .sendMessage(line.substring(line.indexOf("!d ") + 3)).queue();
+                                    .sendMessage(listofwords.get(i) + " " + line.substring(j + 3)).queue();
                         }
                         System.out.println(line);
                     }
@@ -124,9 +124,9 @@ public class ServerManager {
         out.flush();
     }
 
-    private static void SendMessageToServerPrivate(String message, String sender) throws IOException {
+    private static void SendMessageToServerPrivate(String message) throws IOException {
         BufferedWriter send = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-        send.write("say [from Discord]" + sender + ": " + message);
+        send.write(message);
         send.write(System.lineSeparator());
         send.flush();
     }
@@ -154,8 +154,11 @@ public class ServerManager {
         };
 
         timer.schedule(task, Long.parseLong(DiscordBot.config.get("SERVER_TIMEOUT_MIN"))*1000*60);
+
+        System.out.println("Timer Started");
     }
     private static void CancelTimer(){
         timer.cancel();
+        System.out.println("Timer Canceled");
     }
 }

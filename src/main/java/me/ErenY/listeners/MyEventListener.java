@@ -128,7 +128,7 @@ public class MyEventListener extends ListenerAdapter {
         if (event.getMessage().getContentRaw().startsWith("!set ngrok")){
             if (event.getMember().isOwner()){
                 NgrokManager.setPublicURL(event.getMessage().getContentRaw().substring(11));
-                DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.customStatus(NgrokManager.getPublicURL()));
+                DiscordBot.getStaticDiscordBot().getShardManager().getGuilds().getFirst().getSelfMember().modifyNickname(NgrokManager.getPublicURL()).queue();
                 event.getChannel().sendMessage("Set public ip").queue();
             }else {
                 event.getChannel().sendMessage("nah").queue();

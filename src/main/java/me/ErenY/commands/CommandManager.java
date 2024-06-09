@@ -95,7 +95,7 @@ public class CommandManager extends ListenerAdapter {
                         if (ServerManager.isStarted()) {
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                             if (DiscordBot.config.get("NGROK").equalsIgnoreCase("True")){
-                                DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.customStatus(NgrokManager.getPublicURL()));
+                                DiscordBot.getStaticDiscordBot().getShardManager().getGuilds().getFirst().getSelfMember().modifyNickname(NgrokManager.getPublicURL()).queue();
                             }
                             event.getHook().sendMessage("Started... i guess").queue();
                             if (NgrokManager.isStarted()){
