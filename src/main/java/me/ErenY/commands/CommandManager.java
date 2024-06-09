@@ -14,7 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
@@ -63,7 +65,17 @@ public class CommandManager extends ListenerAdapter {
                         DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.IDLE);
                         event.reply("starting... wait...").queue();
                         try {
-                            ServerManager.StartServer(new String[]{});
+                            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 9){
+                                if (!event.getMember().isOwner()){
+                                ServerManager.StartServer(Integer.parseInt(DiscordBot.config.get("XMX"))/2, null);
+                                event.getHook().sendMessage("bu saatte napıyon sana yarım ciguli ram çok lazımsa ara").queue();
+                                }else {
+                                    event.getHook().sendMessage("emredersiniz hükümdarım").queue();
+                                    ServerManager.StartServer(Integer.parseInt(DiscordBot.config.get("XMX")), null);
+                                }
+                            }else {
+                                ServerManager.StartServer(Integer.parseInt(DiscordBot.config.get("XMX")), null);
+                            }
                         } catch (IOException | InterruptedException e) {
                             event.getHook().sendMessage("botun anası sikilmiş bulunmakta naptınız amk" + e).queue();
                         }
@@ -86,7 +98,9 @@ public class CommandManager extends ListenerAdapter {
                                 DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.customStatus(NgrokManager.getPublicURL()));
                             }
                             event.getHook().sendMessage("Started... i guess").queue();
-                            if (NgrokManager.isStarted()) event.getHook().sendMessage(NgrokManager.getPublicURL().substring(6)).queue();
+                            if (NgrokManager.isStarted()){
+                                event.getHook().sendMessage(NgrokManager.getPublicURL().substring(6)).queue();
+                            }
                         }
                         break;
                     case 1:
@@ -137,7 +151,7 @@ public class CommandManager extends ListenerAdapter {
                 String message = optionMapping1.getAsString();
 
                 try {
-                    ServerManager.SendMessageToServer(message, event.getUser().getName());
+                    ServerManager.SendMessageToServer("say [from Discord]" + event.getUser().getName() + ": " + message);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -156,9 +170,6 @@ public class CommandManager extends ListenerAdapter {
                 .addChoice("Start", 0L)
                 .addChoice("Stop", 1L)
                 .addChoice("Status", 2L);
-
-        //todo add say and command choice to /server (maybe add command as text to only for owner to be able to do)
-
         commands.add(Commands.slash("server", "manage server").addOptions(option1));
 
         OptionData option2 = new OptionData(OptionType.STRING, "message", "send message to server", true);

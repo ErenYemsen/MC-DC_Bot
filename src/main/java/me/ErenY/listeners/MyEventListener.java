@@ -7,16 +7,35 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.io.IOException;
+
 
 public class MyEventListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        String message = event.getMessage().getContentRaw();
+        /*
 
         if (!event.getAuthor().isBot()) {
             event.getChannel().sendMessage("üçbir").queue();
         }
 
-        if (event.getMessage().getContentRaw().equals("!ngrok stop")){
+         */
+
+        if (message.contains("!command ")){
+            if (event.getMember().isOwner()){
+                try {
+                    ServerManager.SendMessageToServer(message.substring(message.indexOf("!command ") + 9));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getMessage().reply("sent!").queue();
+            }else {
+                event.getChannel().sendMessage("nah").queue();
+            }
+        }
+
+        if (message.equals("!ngrok stop")){
             if (event.getMember().isOwner()){
                 if (!NgrokManager.isStarted()){
                     event.getChannel().sendMessage("already stopped").queue();
@@ -29,7 +48,7 @@ public class MyEventListener extends ListenerAdapter {
             }
         }
 
-        if (event.getMessage().getContentRaw().equals("!ngrok restart")){
+        if (message.equals("!ngrok restart")){
             if (event.getMember().isOwner()) {
                 if (NgrokManager.isStarted()) {
                     event.getChannel().sendMessage("emrolur").queue();
@@ -75,7 +94,7 @@ public class MyEventListener extends ListenerAdapter {
             }
         }
 
-        if (event.getMessage().getContentRaw().equals("!server switch lockdown")){
+        if (message.equals("!server switch lockdown")){
             if (event.getMember().isOwner()){
                 if (!DiscordBot.lockdownMode){
                     DiscordBot.lockdownMode = true;
@@ -94,7 +113,7 @@ public class MyEventListener extends ListenerAdapter {
             }
         }
 
-        if (event.getMessage().getContentRaw().equals("!server players")){
+        if (message.equals("!server players")){
             if (event.getMember().isOwner()){
                 if (ServerManager.isStarted()){
                     event.getChannel().sendMessage(ServerManager.getListofplayers().toString()).queue();

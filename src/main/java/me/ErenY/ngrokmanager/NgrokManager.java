@@ -1,6 +1,8 @@
 package me.ErenY.ngrokmanager;
 
 import com.github.alexdlaird.ngrok.NgrokClient;
+import com.github.alexdlaird.ngrok.installer.NgrokInstaller;
+import com.github.alexdlaird.ngrok.process.NgrokLog;
 import com.github.alexdlaird.ngrok.process.NgrokProcess;
 import com.github.alexdlaird.ngrok.protocol.CreateTunnel;
 import com.github.alexdlaird.ngrok.protocol.Proto;
@@ -44,7 +46,8 @@ public class NgrokManager {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        StartTunnel();
+
+
 
     }
     public static void StartTunnel(){

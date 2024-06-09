@@ -4,15 +4,16 @@ package me.ErenY.servermanager;
 import me.ErenY.DiscordBot;
 import me.ErenY.ngrokmanager.NgrokManager;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
+import net.dv8tion.jda.api.entities.Activity;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.sql.Time;
+import java.util.*;
 
 
 public class ServerManager {
+    private static Timer timer;
+    private static TimerTask task;
     private static final List<String> listofplayers = new ArrayList<>();
     private static boolean started = false;
     private static Process process;
@@ -32,8 +33,8 @@ public class ServerManager {
         return started;
     }
 
-    public static void StartServer(String[] args) throws IOException, InterruptedException {
-        StartServerPrivate(args);
+    public static void StartServer(int g, String[] args) throws IOException, InterruptedException {
+        StartServerPrivate(g, args);
     }
     public static void StopServer() throws IOException, InterruptedException {
         StopProcess();
@@ -42,8 +43,8 @@ public class ServerManager {
         SendMessageToServerPrivate(message, sender);
     }
 
-    private static void StartServerPrivate(String[] args) throws IOException, InterruptedException {
-        process = StartProcess(DiscordBot.config.get("SERVER_DIRECTORY"), Integer.parseInt(DiscordBot.config.get("XMX")), args);
+    private static void StartServerPrivate(int g, String[] args) throws IOException, InterruptedException {
+        process = StartProcess(DiscordBot.config.get("SERVER_DIRECTORY"), g, args);
     }
 
     private static Process StartProcess(String directory, int g, String... args) throws IOException {
@@ -76,14 +77,23 @@ public class ServerManager {
                             NgrokManager.StopTunnel();
                             }
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.DO_NOT_DISTURB);
+                            listofplayers.clear();
                         }
                         if (line.contains("joined")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             listofplayers.add(listofwords.get(listofwords.indexOf("joined")-1));
+                            if (timer != null){
+                                CancelTimer();
+                            }
+                            DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.playing(listofplayers.size() + " kişi"));
                         }
                         if (line.contains("left")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
                             listofplayers.remove(listofwords.get(listofwords.indexOf("left")-1));
+                            if (listofplayers.isEmpty()){
+                                StartTimer();
+                                DiscordBot.getStaticDiscordBot().getShardManager().setActivity(Activity.watching("porno"));
+                            }
                         }
                         if (line.contains("!d ")){
                             List<String> listofwords = Arrays.asList(line.split(" "));
@@ -91,7 +101,7 @@ public class ServerManager {
                             int j = line.indexOf("!d");
                             DiscordBot.getStaticDiscordBot().getShardManager()
                                     .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
-                                    .sendMessage(listofwords.get(i-1) + " " + line.substring(j+3)).queue();
+                                    .sendMessage(line.substring(line.indexOf("!d ") + 3)).queue();
                         }
                         System.out.println(line);
                     }
@@ -126,5 +136,26 @@ public class ServerManager {
                 "\nis ngrok started: " + NgrokManager.isStarted() +
                 "\nserver ip: " + NgrokManager.getPublicURL() +
                 "\nplayer count: " + listofplayers.size();
+    }
+
+    private static void StartTimer(){
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    StopServer();
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                DiscordBot.getStaticDiscordBot().getShardManager()
+                        .getTextChannelById(DiscordBot.config.get("SERVER_TO_DISCORD_CHANNEL_ID"))
+                        .sendMessage("olm çıkarken kapatsanıza").queue();
+            }
+        };
+
+        timer.schedule(task, Long.parseLong(DiscordBot.config.get("SERVER_TIMEOUT_MIN"))*1000*60);
+    }
+    private static void CancelTimer(){
+        timer.cancel();
     }
 }
