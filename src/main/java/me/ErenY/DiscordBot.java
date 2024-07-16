@@ -45,8 +45,8 @@ public class DiscordBot {
     public static void main(String[] args) {
 
         DiscordBot discordBot = new DiscordBot();
-        discordBot.getShardManager().getGuilds().getFirst().getSelfMember().modifyNickname("otuzbirci").queue();
         staticDiscordBot = discordBot;
+        discordBot.getShardManager().getGuilds().getFirst().getSelfMember().modifyNickname("otuzbirci").queue();
 
     }
 
