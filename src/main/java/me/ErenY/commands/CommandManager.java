@@ -88,6 +88,7 @@ public class CommandManager extends ListenerAdapter {
                                     Thread.sleep(1000);
                                 } catch (Exception e) {
                                     logger.error("Exception while waiting for oci to start", e);
+                                    break;
                                 }
                                 timeOCI++;
                             }
@@ -124,10 +125,12 @@ public class CommandManager extends ListenerAdapter {
                                         Thread.sleep(1000);
                                     } catch (Exception e) {
                                         logger.error("Exception while waiting for FRP Server to start", e);
+                                        break;
                                     }
                                     frpstime++;
                                 }else {
                                     logger.warn("Timed out while waiting for FRP Server to start");
+                                    break;
                                 }
                             }
                             //run frpc on local
@@ -174,11 +177,12 @@ public class CommandManager extends ListenerAdapter {
                                 Thread.sleep(1000);
                             } catch (Exception e) {
                                 logger.error("Exception while starting server", e);
+                                break;
                             }
                             timeStart++;
                         }
                         if (ServerManager.isStarted()) {
-                            logger.info("Server is started");
+                            logger.info("Server is started ({})",System.currentTimeMillis() - time);
                             DiscordBot.getStaticDiscordBot().getShardManager().setStatus(OnlineStatus.ONLINE);
                             String st = ServerManager.getPublicIpString();
                             if (View.pref.get("USE_OCI", View.prop.getProperty("USE_OCI")).equalsIgnoreCase("true")){
@@ -186,7 +190,7 @@ public class CommandManager extends ListenerAdapter {
                                         .getSelfMember().modifyNickname(st).queue();
                                 logger.info("Set discord bot nickname to public ip: {}", st);
                             }
-                            event.getChannel().sendMessage("Server Started").queue();
+                            event.getChannel().sendMessage("Server Started ("+(System.currentTimeMillis() - time)+"ms)").queue();
                             if (View.pref.get("USE_OCI", View.prop.getProperty("USE_OCI")).equalsIgnoreCase("true")){
                                 event.getChannel().sendMessage(st).queue();
                                 logger.info("Sent discord public ip: {}", st);
@@ -213,6 +217,7 @@ public class CommandManager extends ListenerAdapter {
                                         frptime++;
                                     }else {
                                         logger.info("Timed out while stopping FRP Client");
+                                        break;
                                     }
                                 }
                                 logger.info("Stopped FRP Client");
@@ -255,6 +260,7 @@ public class CommandManager extends ListenerAdapter {
                                 Thread.sleep(1000);
                             } catch (Exception e) {
                                 logger.error("Exception while waiting for server to stop");
+                                break;
                             }
                             timeStop++;
                         }

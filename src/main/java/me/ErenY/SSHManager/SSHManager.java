@@ -58,16 +58,54 @@ public class SSHManager {
 
         channelExec.connect();
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            View.sshConsole.append(line + "\n");
-            System.out.println(line);
-        }
+        Runnable runnableSTDOUT = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        View.sshConsole.append(line + "\n");
+                    }
 
-        logger.info("Exit status: {}", channelExec.getExitStatus());
+                    logger.info("Exit status: {}", channelExec.getExitStatus());
 
-        reader.close();
-        channelExec.disconnect();
+                    reader.close();
+                    channelExec.disconnect();
+                }catch (Exception e){
+                    logger.error("Exception in ssh execute command STDOUT thread");
+                }
+            }
+        };
+
+
+        InputStream ien = channelExec.getErrStream();
+        BufferedReader ereader = new BufferedReader(new InputStreamReader(ien));
+        Runnable runnableSTDERR = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String line;
+                    while ((line = ereader.readLine()) != null) {
+                        View.sshConsole.append(line + "\n");
+                    }
+
+                    logger.info("STDERR Exit status: {}", channelExec.getExitStatus());
+
+                    ereader.close();
+                    channelExec.disconnect();
+                }catch (Exception e){
+                    logger.error("Exception in ssh execute command STDERR thread");
+                }
+            }
+        };
+
+
+
+        Thread thread = new Thread(runnableSTDOUT);
+        Thread thread1 = new Thread(runnableSTDERR);
+        thread.start();
+        thread1.start();
+
         logger.info("executed command in ssh: {}", command);
     }
 
@@ -86,17 +124,16 @@ public class SSHManager {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         this.out = channelExec.getOutputStream();
 
-        Runnable runnable = new Runnable() {
+        channelExec.connect();
+
+        Runnable runnableSTDOUT = new Runnable() {
             @Override
             public void run() {
                 try {
-                    channelExec.connect();
-
                     String line;
                     while ((line = reader.readLine()) != null) {
                         View.sshConsole.append(line + "\n");
                         logger.trace(line);
-                        System.out.println(line);
                         if (line.contains("frps started successfully")){
                             setFRPStarted(true);
                         }
@@ -113,8 +150,34 @@ public class SSHManager {
             }
         };
 
-        Thread thread = new Thread(runnable);
+        InputStream ien = channelExec.getErrStream();
+        BufferedReader ereader = new BufferedReader(new InputStreamReader(ien));
+
+        Runnable runnableSTDERR = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String line;
+                    while ((line = ereader.readLine()) != null){
+                        View.sshConsole.append("STDERR: " + line + "\n");
+                        logger.error("STDERR: {}",line);
+                    }
+
+                    View.sshConsole.append(LocalDateTime.now() + " FRP Server Stopped with exit code: " + channelExec.getExitStatus() + "\n");
+                    logger.info("SSH STDERR Exit status: {}", channelExec.getExitStatus());
+
+                    ereader.close();
+                    channelExec.disconnect();
+                }catch (Exception e){
+                    logger.error("Exception in FRPS process thread",e);
+                }
+            }
+        };
+
+        Thread thread = new Thread(runnableSTDOUT);
+        Thread thread1 = new Thread(runnableSTDERR);
         thread.start();
+        thread1.start();
         logger.info("Frps thread started");
     }
 

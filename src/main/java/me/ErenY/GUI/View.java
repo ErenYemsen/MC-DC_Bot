@@ -652,6 +652,7 @@ public class View {
                         }
                         s = f.getParent().replace("\\", "/");
                         sv_dir.setText(s);
+                        pref.put("SERVER_FILENAME", f.getName());
                         logger.info("Selected server jar file");
                     }else {
                         logger.info("Cancelled server jar file selection");

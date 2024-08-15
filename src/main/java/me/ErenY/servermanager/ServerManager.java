@@ -61,7 +61,7 @@ public class ServerManager {
     private static Process StartProcess(String directory, int g) throws IOException {
         final ProcessBuilder pb = new ProcessBuilder();
 
-        List<String> commands = new ArrayList<>(Arrays.asList("java", "-Xms" + g + "G", "-Xmx" + g + "G", "-jar", "server.jar", "--nogui"));
+        List<String> commands = new ArrayList<>(Arrays.asList("java", "-Xms" + g + "G", "-Xmx" + g + "G", "-jar", View.pref.get("SERVER_FILENAME","server.jar"), "--nogui"));
 
         pb.directory(new File(directory));
         pb.command(commands);
@@ -72,13 +72,12 @@ public class ServerManager {
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
 
-        Runnable runnable = new Runnable() {
+        Runnable runnableSTDOUT = new Runnable() {
             @Override
             public void run() {
                 try {
                     String line;
                     while ((line = br.readLine()) != null) {
-                        System.out.println(line);
                         View.serverConsole.append(line + "\n");
                         logger.trace(line);
                         if (line.contains("Done")){
@@ -137,15 +136,40 @@ public class ServerManager {
                             logger.info("Refreshed server info");
                         }
                     }
+                    int exitCode = process.waitFor();
+                    logger.debug("\nProcess STDOUT exited with error code : {}", exitCode);
                 } catch (Exception e) {
-                    logger.error("Exception in server thread", e);
+                    logger.error("Exception in STDOUT server thread", e);
                 }
             }
         };
 
-        Thread t1 = new Thread(runnable);
+        InputStream ies = p.getErrorStream();
+        InputStreamReader iesr = new InputStreamReader(ies);
+        BufferedReader ber = new BufferedReader(iesr);
+
+        Runnable runnableSTDERR = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String line;
+                    while ((line = ber.readLine()) != null){
+                        View.serverConsole.append("STDERR: " + line + "\n");
+                        logger.error("STDERR: {}", line);
+                    }
+                    int exitCode = process.waitFor();
+                    logger.debug("\nProcess STDERR exited with error code : {}", exitCode);
+                }catch (Exception e){
+                    logger.error("Exception in STDERR server thread", e);
+                }
+            }
+        };
+
+        Thread t1 = new Thread(runnableSTDOUT);
+        Thread t2 = new Thread(runnableSTDERR);
         t1.start();
-        logger.info("Started server thread");
+        t2.start();
+        logger.info("Started server threads");
         return p;
     }
 
@@ -193,13 +217,11 @@ public class ServerManager {
                 Integer.parseInt(View.pref.get("SERVER_TIMEOUT_MIN", View.prop.getProperty("SERVER_TIMEOUT_MIN"))),
                 TimeUnit.MINUTES);
 
-        System.out.println("Timer Started");
         logger.info("Timer Started");
     }
     private static void CancelTimer(){
         scheduledTask.cancel(false);
         scheduledTask = null;
-        System.out.println("Timer Canceled");
         logger.info("Timer Canceled");
     }
     private static void TimeoutServer(){

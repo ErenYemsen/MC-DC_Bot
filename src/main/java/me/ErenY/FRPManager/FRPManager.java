@@ -98,7 +98,7 @@ public class FRPManager {
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
 
-        Runnable runnable = new Runnable() {
+        Runnable runnableSTDOUT = new Runnable() {
             @Override
             public void run() {
                 try {
@@ -109,11 +109,10 @@ public class FRPManager {
                         if (line.contains("[MCDC-bot] start proxy success")){
                             setConnected(true);
                         }
-                        System.out.println(line);
                     }
 
                     int exitCode = process.waitFor();
-                    logger.debug("\nExited with error code : {}", exitCode);
+                    logger.debug("\nProcess STDOUT exited with error code : {}", exitCode);
 
                 } catch (IOException e) {
                     logger.error("IOException while running frp client or it may just stopped", e);
@@ -123,8 +122,31 @@ public class FRPManager {
             }
         };
 
-        Thread thread = new Thread(runnable);
+        InputStream ies = p.getErrorStream();
+        InputStreamReader iesr = new InputStreamReader(ies);
+        BufferedReader ber = new BufferedReader(iesr);
+
+        Runnable runnableSTDERR = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String line;
+                    while ((line = ber.readLine()) != null){
+                        View.frpConsole.append("STDERR: " + line + "\n");
+                        logger.error("STDERR: {}", line);
+                    }
+                    int exitCode = process.waitFor();
+                    logger.debug("\nProcess STDERR exited with error code : {}", exitCode);
+                }catch (Exception e){
+                    logger.error("Exception in STDERR FRPC thread", e);
+                }
+            }
+        };
+
+        Thread thread = new Thread(runnableSTDOUT);
+        Thread thread1 = new Thread(runnableSTDERR);
         thread.start();
+        thread1.start();
     }
 
     public void stopFRPClient() throws IOException {
