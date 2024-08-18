@@ -181,6 +181,9 @@ I tried my best to make sure you need the least amount of work, but you still do
 
 #### Changelog
 
+##### V2.0.1
+  - STDERR updated
+  - logger bugfix
 
 ##### V2.0
   - Removed Ngrok completely because I hate it
