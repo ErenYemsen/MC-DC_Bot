@@ -54,6 +54,7 @@ I tried my best to make sure you need the least amount of work, but you still do
 - [Mandatory] Private Key Path
   - Create Oracle Cloud Infrastructure account
   - Create an Ubuntu instance, generate and save your private key file
+  - Add ingress rule to allow traffic on TCP protocol
   - Select the file by pressing the button
   - Example: `/Users/{name}/Downloads/ssh-key.key`
   - [Important] Configure Oracle Cloud Infrastructure config file (See [below](#how-to-configure-oci-config-file))
@@ -178,6 +179,7 @@ I tried my best to make sure you need the least amount of work, but you still do
 #### Known Issues
 
 - On Windows FRProxy may be blocked by antivirus software, this is caused by usage of [FRP](https://github.com/fatedier/frp) on the project
+- Due to oracle adding lot of entries to /etc/iptables/rules.v4 and blocking a lot, you may need to modify the iptables rules to allow forwarding. Also do not forget to restore the iptables
 
 #### Changelog
 
@@ -187,5 +189,5 @@ I tried my best to make sure you need the least amount of work, but you still do
 
 ##### V2.0
   - Removed Ngrok completely because I hate it
-  - Added Oracle Cloud Infrastructure because I love it
+  - Added Oracle Cloud Infrastructure because I hate it also
   - Made a GUI for better use
